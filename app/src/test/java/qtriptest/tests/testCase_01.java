@@ -2,13 +2,18 @@ package qtriptest.tests;
 
 import qtriptest.DP;
 import qtriptest.DriverSingleton;
+import qtriptest.ReportSingleton;
 import qtriptest.DriverSingleton;
 import qtriptest.pages.HomePage;
 import qtriptest.pages.LoginPage;
 import qtriptest.pages.RegisterPage;
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.TimeoutException;
+import com.relevantcodes.extentreports.ExtentReports;
+import com.relevantcodes.extentreports.ExtentTest;
+import com.relevantcodes.extentreports.LogStatus;
 import org.apache.logging.log4j.core.util.Assert;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -22,16 +27,22 @@ public class testCase_01 {
 
   //static RemoteWebDriver driver;
   public String lastGeneratedUsername= "";
+  
+  static ExtentReports report;
+  static ExtentTest test;
 
-  @BeforeTest(alwaysRun = true)
+  @BeforeSuite(alwaysRun = true)
   public static void createDriver() throws MalformedURLException {
-    // Launch Browser using Zalenium
-    // final DesiredCapabilities capabilities = new DesiredCapabilities();
-    // capabilities.setBrowserName(BrowserType.CHROME);
-    // driver = new RemoteWebDriver(new URL("http://localhost:8082/wd/hub"), capabilities);
-    // System.out.println("createDriver()");
-    // driver.manage().window().maximize();
+    
     DriverSingleton.getInstance();
+    
+    // report = new ExtentReports(System.getProperty("user.dir")+"/ExtentReportResults.html");
+    // System.out.println(System.getProperty("user.dir"));
+    // report.loadConfig(new File(System.getProperty("user.dir")+"/extent_customization_configs.xml"));
+     ReportSingleton rs=ReportSingleton.getObject();
+     report=rs.getReports();
+    
+    test = report.startTest("Extent_TestCase01");
  }
 
  
@@ -53,6 +64,7 @@ public class testCase_01 {
 
     status = registration.assertRegistrationpg();
     assertTrue(status, "unable to assert registration");
+    test.log(LogStatus.PASS, "Test passed");
 
    status= registration.registerUser(UserName, Password, true);
     
@@ -78,10 +90,13 @@ public class testCase_01 {
     assertTrue(status, "unable to logout");
     }
 
-//     @AfterTest
-//   public static void teardown (){
-//   DriverSingleton.close();
-//  }
+   @AfterSuite
+ public static void teardown (){
+//    DriverSingleton.close();
+   report.endTest(test);
+   report.flush();
+}
+
    
 
 }

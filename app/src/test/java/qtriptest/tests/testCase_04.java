@@ -2,6 +2,7 @@ package qtriptest.tests;
 
 import qtriptest.DP;
 import qtriptest.DriverSingleton;
+import qtriptest.ReportSingleton;
 import qtriptest.pages.AdventureDetailsPage;
 import qtriptest.pages.AdventurePage;
 import qtriptest.pages.HistoryPage;
@@ -10,7 +11,10 @@ import qtriptest.pages.LoginPage;
 import qtriptest.pages.RegisterPage;
 import java.net.MalformedURLException;
 import java.util.concurrent.TimeoutException;
+import com.relevantcodes.extentreports.ExtentReports;
+import com.relevantcodes.extentreports.ExtentTest;
 import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
@@ -19,10 +23,17 @@ public class testCase_04 {
 
     boolean status;
     public String lastGeneratedUsername = "";
+    static ExtentReports report;
+    static ExtentTest test;
+    
 
-    @BeforeTest(alwaysRun = true)
+    @BeforeSuite(alwaysRun = true)
     public static void createDriver() throws MalformedURLException {
         DriverSingleton.getInstance();
+        ReportSingleton rs=ReportSingleton.getObject();
+        report=rs.getReports();
+       
+       test = report.startTest("Extent_TestCase04");
     }
 
     @Test(dataProvider = "data_Provider", dataProviderClass = DP.class,priority=4,description = "testCase04",groups = {"Reliability Flow"})
@@ -106,6 +117,8 @@ public class testCase_04 {
     }
     @AfterSuite
     public static void teardown (){
-    DriverSingleton.close();
-    }
+   //    DriverSingleton.close();
+      report.endTest(test);
+      report.flush();
+   }
 }
